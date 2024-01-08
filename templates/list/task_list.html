@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>
+    TODO list
+    <a href="{% url 'list:task-create' %}" style="float: right" class="btn btn-primary link-to-page">
+      New task
+    </a>
+  </h1>
+  {% if task_list %}
+    <ul>
+      {% for task in task_list %}
+        {% comment %} <li>
+          <a href="{% url "taxi:car-detail" pk=car.id %} ">{{ car.id }}</a>
+          {{ car.model }} ({{ car.manufacturer.name }})
+        </li> {% endcomment %}
+        <div class="card">
+          
+            <h4 class="card-header">{{ task.name }}</h4>
+          <div display: inline>
+            <span class="badge badge-info">Priority: {{ task.priority }} </span>
+            {% if  task.is_completed %}
+              <span class="badge badge-success">DONE</span>
+              <form action="{% url 'list:task-complete' pk=task.id %}" method="post" novalidate>
+                {% csrf_token %}
+                <input type="hidden" name="is_completed" value="False">
+                <input type="submit" value="Undo" class="btn btn-secondary">
+              </form>
+            {% else %}
+              <span class="badge badge-danger">NOT DONE</span>
+              <form action="{% url 'list:task-complete' pk=task.id %}" method="post" novalidate>
+                {% csrf_token %}
+                <input type="hidden" name="is_completed" value="True">
+                <input type="submit" value="Complete" class="btn btn-success">
+              </form>
+            {% endif %}
+          </div>
+          
+          <div class="card-body">
+            <h5 class="card-title">{{ task.description}}</h5>
+            <p class="card-text">Created: {{ task.start_time }} 
+              {% if   task.is_completed %}
+              <span class="badge badge-secondary">DEADLINE: {{ task.deadline }} </span></p>
+              {% else %}
+              <span class="badge badge-danger">DEADLINE: {{ task.deadline }} </span></p>
+              {% endif %} 
+            <a href="{% url 'list:task-update' pk=task.id %}" class="btn btn-primary">Update</a> <a href="{% url 'list:task-delete' pk=task.id %}" class="btn btn-primary">Delete</a>
+            <h5 class="card-title">Tags: {% for tag in task.tags.all %} {{ tag }}, {% endfor %} </h5>
+          </div>
+        </div>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>There are no tasks yet</p>
+  {% endif %}
+{% endblock %}
